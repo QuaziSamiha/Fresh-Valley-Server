@@ -24,6 +24,14 @@ client.connect(err => {
     const foodCollection = client.db("freshValleyFood").collection("foods");
     // console.log('database connected successfully!!');
 
+    app.get('/products', (req, res) => {
+        foodCollection.find()
+            .toArray((err, products) => {
+                // console.log('from database ', products);
+                res.send(products)
+            })
+    })
+
     app.post('/addProduct', (req, res) => {
         const newProduct = req.body;
         // console.log('adding new product: ', newProduct);
