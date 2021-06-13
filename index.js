@@ -24,6 +24,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
     // console.log('connection error: ', err);
     const foodCollection = client.db("freshValleyFood").collection("foods");
+    const usersCollection = client.db("freshValleyFood").collection("users");
     // console.log('database connected successfully!!');
 
     // for adding a single product from admin page
@@ -56,6 +57,25 @@ client.connect(err => {
             })
     })
 
+    // for check out page product and user detail will be stored in database
+    app.post('/addOrder', (req, res) => {
+        const newOrderDetail = req.body;
+        console.log(newOrderDetail);
+        usersCollection.insertOne(newOrderDetail)
+            .then(result => {
+                console.log('inserted count: ', result.insertedCount);
+                res.send(result.insertedCount > 0)
+            })
+    })
+
+    // loading product and user detail from database to display on check out page for specific user
+    app.get('/orderedProduct', (req, res) => {
+        // console.log(req.query.email);
+        usersCollection.find({ email: req.query.email })
+            .toArray((err, documents) => {
+                res.send(documents);
+            })
+    })
     // client.close();
 });
 
