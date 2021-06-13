@@ -1,8 +1,10 @@
+const ObjectID = require('mongodb').ObjectID
 const express = require('express')
 const MongoClient = require('mongodb').MongoClient;
 const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config()
+
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -24,6 +26,18 @@ client.connect(err => {
     const foodCollection = client.db("freshValleyFood").collection("foods");
     // console.log('database connected successfully!!');
 
+    // for adding a single product from admin page
+    app.post('/addProduct', (req, res) => {
+        const newProduct = req.body;
+        // console.log('adding new product: ', newProduct);
+        foodCollection.insertOne(newProduct)
+            .then(result => {
+                console.log('inserted count: ', result.insertedCount);
+                res.send(result.insertedCount > 0)
+            })
+    })
+
+    // for loading all products in home page
     app.get('/products', (req, res) => {
         foodCollection.find()
             .toArray((err, products) => {
@@ -32,13 +46,13 @@ client.connect(err => {
             })
     })
 
-    app.post('/addProduct', (req, res) => {
-        const newProduct = req.body;
-        // console.log('adding new product: ', newProduct);
-        foodCollection.insertOne(newProduct)
-            .then(result => {
-                console.log('inserted count: ', result.insertedCount);
-                res.send(result.insertedCount > 0)
+    // for display ordered product in order page
+    app.get('/orderedProduct/:productId', (req, res) => {
+        // console.log(req.params);
+        foodCollection.find({ _id: ObjectID(req.params.productId) })
+            .toArray((err, documents) => {
+                // console.log(documents);
+                res.send(documents[0]);
             })
     })
 
