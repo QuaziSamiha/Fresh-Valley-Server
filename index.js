@@ -33,7 +33,7 @@ client.connect(err => {
         // console.log('adding new product: ', newProduct);
         foodCollection.insertOne(newProduct)
             .then(result => {
-                console.log('inserted count: ', result.insertedCount);
+                // console.log('inserted count: ', result.insertedCount);
                 res.send(result.insertedCount > 0)
             })
     })
